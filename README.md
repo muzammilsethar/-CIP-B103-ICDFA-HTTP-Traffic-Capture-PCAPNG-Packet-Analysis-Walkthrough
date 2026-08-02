@@ -28,7 +28,7 @@ Step 2: Apache Web Service Configuration & Health CheckEnabling Apache2 service 
 printf '<!DOCTYPE html>\n<html><body><h1>CIP-B103 HTTP Evidence</h1><p>Name: Mohammad Muzamil</p><p>Reg No: C11/26/DFIT/17289</p></body></html>\n' | sudo tee /var/www/html/basic.html
 sudo systemctl status apache2 --no-pager
 Step 3: Local Port Binding & HTTP Endpoint VerificationValidating Apache socket listener on port 80 and verifying HTTP GET response code 200 OK.Executed Commands:Bashsudo ss -lntp | grep ':80'
-curl -v http://127.0.0.1/basic.html 2>&1 | tee reports/curl_verbose.txt
+curl -v [http://127.0.0.1/basic.html](http://127.0.0.1/basic.html) 2>&1 | tee reports/curl_verbose.txt
 Technical Findings:Listener Status: Active socket bound to *:80 under Apache PID (30523).HTTP Protocol Output: HTTP/1.1 200 OK (Content-Type: text/html, Content-Length: 135 bytes).Step 4: Network Packet Capture & File Integrity BaselineCapturing loopback HTTP traffic with tshark, storing evidence to evidence/basic.pcapng, and creating a working copy for dynamic analysis.Executed Commands:Bashsudo tshark -i lo -f 'tcp port 80' -w /tmp/basic.pcapng
 sudo mv /tmp/basic.pcapng evidence/basic.pcapng
 sudo chown $USER:$USER evidence/basic.pcapng
