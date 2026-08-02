@@ -1,0 +1,2 @@
+# -CIP-B103-ICDFA-HTTP-Traffic-Capture-PCAPNG-Packet-Analysis-Walkthrough
+This technical laboratory report documents the execution of network traffic capture, local web service deployment, HTTP protocol analysis, and forensic artifact extraction using tshark, curl, and Apache2 on Kali Linux. The analysis verifies 3-way TCP handshakes, extracts HTTP request/response payloads, and evidentiary integrity SHA-256  hashes.
