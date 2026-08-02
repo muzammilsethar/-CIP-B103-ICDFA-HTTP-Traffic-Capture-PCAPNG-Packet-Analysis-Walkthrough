@@ -1,26 +1,19 @@
-# 🌐 CIP-B103 Lab 1: HTTP Traffic Capture & PCAPNG Packet Analysis Walkthrough
+🌐 CIP-B103 Lab 1: HTTP Traffic Capture & PCAPNG Packet Analysis Walkthrough
+📝 Executive Overview
+This technical laboratory report documents the execution of network traffic capture, local web service deployment, HTTP protocol analysis, and forensic artifact extraction using tshark, curl, and Apache2 on Kali Linux. The analysis verifies 3-way TCP handshakes, extracts HTTP request/response payloads, and ensures evidentiary integrity using SHA-256 cryptographic hashes.
 
-## 📝 Executive Overview
-This technical laboratory report documents the execution of network traffic capture, local web service deployment, HTTP protocol analysis, and forensic artifact extraction using **tshark**, **curl**, and **Apache2** on Kali Linux. The analysis verifies 3-way TCP handshakes, extracts HTTP request/response payloads, and ensures evidentiary integrity using SHA-256 cryptographic hashes.
+🛠️ Toolset & Working Environment
+OS / Environment: Kali Linux (kalimomi@kali)
 
----
+Working Directory: ~/CIP-B103-Lab1
 
-## 🛠️ Toolset & Working Environment
+Core Utilities: apache2, tshark, curl, sha256sum, ss
 
-* **OS / Environment:** Kali Linux (`kalimomi@kali`)
-* **Working Directory:** `~/CIP-B103-Lab1`
-* **Core Utilities:** `apache2`, `tshark`, `curl`, `sha256sum`, `ss`
-
----
-
-## 🚀 Step-by-Step Execution & Technical Documentation
-
-### Step 1: Environment Directory Setup & Tool Installation
-
+🚀 Step-by-Step Execution & Technical Documentation
+Step 1: Environment Directory Setup & Tool Installation
 Directory structure creation and dependency package updates for network traffic analysis.
 
-#### Executed Commands:
-```bash
+Executed Commands:
 mkdir -p ~/CIP-B103-Lab1/{evidence,working,exported,reports,screenshots,scripts}
 cd ~/CIP-B103-Lab1
 sudo apt update && sudo apt install -y apache2 curl wireshark tshark
@@ -30,7 +23,7 @@ Enabling Apache2 service and generating custom HTTP evidence index page (/var/ww
 
 Executed Commands:
 sudo systemctl enable --now apache2
-printf '<!DOCTYPE html>\n<html><body><h1>CIP-B103 HTTP Evidence</h1><p>Name: Mohammad Muzamil</p><p>Reg No: C11/26/DFIT/17289</p></body></html>\n' | sudo tee /var/www/html/basic.html
+printf '\nCIP-B103 HTTP EvidenceName: Mohammad MuzamilReg No: C11/26/DFIT/17289\n' | sudo tee /var/www/html/basic.html
 sudo systemctl status apache2 --no-pager
 
 Step 3: Local Port Binding & HTTP Endpoint Verification
@@ -38,7 +31,7 @@ Validating Apache socket listener on port 80 and verifying HTTP GET response cod
 
 Executed Commands:
 sudo ss -lntp | grep ':80'
-curl -v [http://127.0.0.1/basic.html](http://127.0.0.1/basic.html) 2>&1 | tee reports/curl_verbose.txt
+curl -v http://127.0.0.1/basic.html 2>&1 | tee reports/curl_verbose.txt
 
 Technical Findings:
 Listener Status: Active socket bound to *:80 under Apache PID (30523).
@@ -53,6 +46,7 @@ sudo tshark -i lo -f 'tcp port 80' -w /tmp/basic.pcapng
 sudo mv /tmp/basic.pcapng evidence/basic.pcapng
 sudo chown $USER:$USER evidence/basic.pcapng
 cp --preserve=timestamps evidence/basic.pcapng working/basic_working.pcapng
+
 sha256sum evidence/basic.pcapng working/basic_working.pcapng | tee reports/capture_hashes.txt
 
 Step 5: TCP Handshake Analysis & Stream Filtering
@@ -79,9 +73,17 @@ Analyzing Layer 2 Ethernet frame properties and verifying full SHA-256 integrity
 Executed Commands:
 tshark -r working/basic_working.pcapng -Y "frame.number == 8" -V | head -n 35 > reports/encapsulation_summary.txt
 cat reports/encapsulation_summary.txt
-sha256sum reports/*.txt exported/* evidence/* working/*
+sha256sum reports/.txt exported/ evidence/* working/*
 
-📊 Evidence & Cryptographic Integrity SummaryFile / Artifact PathPurposeSHA-256 Cryptographic Hashreports/capture_hashes.txtInitial Hash Baseline Log14409e85d4774021e40b2ee1445f9220577d5136076532ffe01e6335d29dec6areports/curl_verbose.txtVerbose HTTP Endpoint Logbf599c777e38e7f9983d8d234e6b0faafcef259e34dc81485c2532f0ab52fe54reports/encapsulation_summary.txtEthernet Frame Properties82414c498304f4cf4711b572d6d9d46ff1613aae2fc84ccf07991ba7c6f2e82ereports/handshake_analysis.txtFull TCP Stream Breakdown40805427cc39a2afcdf0d2dff7b783a1033cf0ce8b43baf68088293e94ae99c3reports/http_request_payload.txtFormatted HTTP Request Frame44459ee22a7289470153d52e5ed1d15807ff1ce019fc9f2c6a46d02fc80bd659reports/http_response_payload.txtFormatted HTTP Response Frame6c2fd598ae480be02d822fbe3affe978d79eb90722bd71cb7be7274f9410d830exported/extracted_evidence.htmlCarved HTML Web Contenta707688e1f2116d3a6cd809a9f671e3324b392335794d80d7a30fd0842848c83evidence/basic.pcapngOriginal Captured Network PCAPd327a8e44f7ce8891b93091d6006c4791152ff367dfe32e294b55da9c802c94working/basic_working.pcapngForensic Analysis Working Copyd327a8e44f7ce8891b93091d6006c4791152ff367dfe32e294b55da9c802c94
-
----
-*Maintained for International Cybersecurity & Digital Forensics Academy (ICDFA) Portfolio.*
+📊 Evidence & Cryptographic Integrity Summary
+File / Artifact Path	Purpose	SHA-256 Cryptographic Hash
+reports/capture_hashes.txt	Initial Hash Baseline Log	14409e85d4774021e40b2ee1445f9220577d5136076532ffe01e6335d29dec6a
+reports/curl_verbose.txt	Verbose HTTP Endpoint Log	bf599c777e38e7f9983d8d234e6b0faafcef259e34dc81485c2532f0ab52fe54
+reports/encapsulation_summary.txt	Ethernet Frame Properties	82414c498304f4cf4711b572d6d9d46ff1613aae2fc84ccf07991ba7c6f2e82e
+reports/handshake_analysis.txt	Full TCP Stream Breakdown	40805427cc39a2afcdf0d2dff7b783a1033cf0ce8b43baf68088293e94ae99c3
+reports/http_request_payload.txt	Formatted HTTP Request Frame	44459ee22a7289470153d52e5ed1d15807ff1ce019fc9f2c6a46d02fc80bd659
+reports/http_response_payload.txt	Formatted HTTP Response Frame	6c2fd598ae480be02d822fbe3affe978d79eb90722bd71cb7be7274f9410d830
+exported/extracted_evidence.html	Carved HTML Web Content	a707688e1f2116d3a6cd809a9f671e3324b392335794d80d7a30fd0842848c83
+evidence/basic.pcapng	Original Captured Network PCAP	d327a8e44f7ce8891b93091d6006c4791152ff367dfe32e294b55da9c802c94
+working/basic_working.pcapng	Forensic Analysis Working Copy	d327a8e44f7ce8891b93091d6006c4791152ff367dfe32e294b55da9c802c94
+Maintained for International Cybersecurity & Digital Forensics Academy (ICDFA) Portfolio.
