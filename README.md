@@ -6,7 +6,7 @@ This technical laboratory report documents the execution of network traffic capt
 
 ---
 
-## 🛠️ Toolset & Working Environment
+🛠️ Toolset & Working Environment
 
 * **OS / Environment:** Kali Linux (`kalimomi@kali`)
 * **Working Directory:** `~/CIP-B103-Lab1`
@@ -14,15 +14,15 @@ This technical laboratory report documents the execution of network traffic capt
 
 ---
 
-## 🚀 Step-by-Step Execution & Technical Documentation
+🚀 Step-by-Step Execution & Technical Documentation
 
-### Step 1: Environment Directory Setup & Tool Installation
+Step 1: Environment Directory Setup & Tool Installation
 
 Directory structure creation and dependency package updates for network traffic analysis.
 
-#### Executed Commands:
+Executed Commands:
 
-```bash
+
 mkdir -p ~/CIP-B103-Lab1/{evidence,working,exported,reports,screenshots,scripts}
 cd ~/CIP-B103-Lab1
 sudo apt update && sudo apt install -y apache2 curl wireshark tshark
@@ -31,13 +31,12 @@ sudo apt update && sudo apt install -y apache2 curl wireshark tshark
 
 ---
 
-### Step 2: Apache Web Service Configuration & Health Check
+Step 2: Apache Web Service Configuration & Health Check
 
 Enabling Apache2 service and generating custom HTTP evidence index page (`/var/www/html/basic.html`).
 
-#### Executed Commands:
+Executed Commands:
 
-```bash
 sudo systemctl enable --now apache2
 printf '<!DOCTYPE html>\n<html><body><h1>CIP-B103 HTTP Evidence</h1><p>Name: Mohammad Muzamil</p><p>Reg No: C11/26/DFIT/17289</p></body></html>\n' | sudo tee /var/www/html/basic.html
 sudo systemctl status apache2 --no-pager
@@ -46,32 +45,30 @@ sudo systemctl status apache2 --no-pager
 
 ---
 
-### Step 3: Local Port Binding & HTTP Endpoint Verification
+Step 3: Local Port Binding & HTTP Endpoint Verification
 
 Validating Apache socket listener on port 80 and verifying HTTP GET response code `200 OK`.
 
-#### Executed Commands:
+Executed Commands:
 
-```bash
 sudo ss -lntp | grep ':80'
 curl -v http://127.0.0.1/basic.html 2>&1 | tee reports/curl_verbose.txt
 
 ```
 
-#### Technical Findings:
+Technical Findings:
 
-* **Listener Status:** Active socket bound to `*:80` under Apache PID (30523).
-* **HTTP Protocol Output:** `HTTP/1.1 200 OK` (Content-Type: text/html, Content-Length: 135 bytes).
+Listener Status:** Active socket bound to `*:80` under Apache PID (30523).
+HTTP Protocol Output:** `HTTP/1.1 200 OK` (Content-Type: text/html, Content-Length: 135 bytes).
 
 ---
 
-### Step 4: Network Packet Capture & File Integrity Baseline
+Step 4: Network Packet Capture & File Integrity Baseline
 
 Capturing loopback HTTP traffic with `tshark`, storing evidence to `evidence/basic.pcapng`, and creating a working copy for dynamic analysis.
 
-#### Executed Commands:
+Executed Commands:
 
-```bash
 sudo tshark -i lo -f 'tcp port 80' -w /tmp/basic.pcapng
 sudo mv /tmp/basic.pcapng evidence/basic.pcapng
 sudo chown $USER:$USER evidence/basic.pcapng
@@ -83,11 +80,11 @@ sha256sum evidence/basic.pcapng working/basic_working.pcapng | tee reports/captu
 
 ---
 
-### Step 5: TCP Handshake Analysis & Stream Filtering
+Step 5: TCP Handshake Analysis & Stream Filtering
 
 Reconstructing TCP 3-Way Handshake (SYN -> SYN-ACK -> ACK) and stream sequence fields.
 
-#### Executed Commands:
+Executed Commands:
 
 ```bash
 tshark -r working/basic_working.pcapng -Y "tcp.port == 80"
@@ -98,13 +95,12 @@ tshark -r working/basic_working.pcapng -Y "tcp.port == 80" -V > reports/handshak
 
 ---
 
-### Step 6: HTTP Payload Extraction & HTML Artifact Reconstruction
+Step 6: HTTP Payload Extraction & HTML Artifact Reconstruction
 
 Isolating HTTP GET requests, HTTP responses, and carving original HTML data stream.
 
-#### Executed Commands:
+Executed Commands:
 
-```bash
 tshark -r working/basic_working.pcapng -Y "http"
 tshark -r working/basic_working.pcapng -Y "frame.number == 4" -V > reports/http_request_payload.txt
 tshark -r working/basic_working.pcapng -Y "frame.number == 6" -V > reports/http_response_payload.txt
@@ -115,13 +111,12 @@ sha256sum reports/http_request_payload.txt reports/http_response_payload.txt exp
 
 ---
 
-### Step 7: Ethernet Encapsulation Review & Master Integrity Audit
+Step 7: Ethernet Encapsulation Review & Master Integrity Audit
 
 Analyzing Layer 2 Ethernet frame properties and verifying full SHA-256 integrity report across all laboratory artifacts.
 
-#### Executed Commands:
+Executed Commands:
 
-```bash
 tshark -r working/basic_working.pcapng -Y "frame.number == 8" -V | head -n 35 > reports/encapsulation_summary.txt
 cat reports/encapsulation_summary.txt
 sha256sum reports/*.txt exported/* evidence/* working/*
@@ -130,7 +125,7 @@ sha256sum reports/*.txt exported/* evidence/* working/*
 
 ---
 
-## 📊 Evidence & Cryptographic Integrity Summary
+📊 Evidence & Cryptographic Integrity Summary
 
 | File / Artifact Path | Purpose | SHA-256 Cryptographic Hash |
 | --- | --- | --- |
